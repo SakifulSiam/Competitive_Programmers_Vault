@@ -21,8 +21,57 @@ const ll MOD = 1e9 + 7;
 #define all(x) (x).begin(), (x).end()
 #define rall(x) (x).rbegin(), (x).rend()
 
+struct DSU {
+    vll p, sz;
+    DSU(int n) : p(n), sz(n, 1) { iota(p.begin(), p.end(), 0); }
+    int find(int x) { return p[x] == x ? x : p[x] = find(p[x]); }
+    bool unite(int a, int b) {
+        a = find(a); b = find(b);
+        if (a == b) return false;
+        if (sz[a] < sz[b]) swap(a, b);
+        p[b] = a; sz[a] += sz[b];
+        return true;
+    }
+    bool same(int a, int b){
+        a = find(a); b = find(b);
+        if (a == b) return true;
+        else return false;
+    }
+};
 void solve() {
-    
+    int n, m, k;
+    cin >> n >> m >> k;
+    vector<pair<int, int>> edges(m);
+    for (int i = 0; i < m; i++) {
+        cin >> edges[i].first >> edges[i].second;
+        edges[i].first--; edges[i].second--;
+    }
+    struct Query {
+        string type;
+        int u, v;
+    };
+    vector<Query> queries(k);
+    for (int i = 0; i < k; i++) {
+        cin >> queries[i].type >> queries[i].u >> queries[i].v;
+        queries[i].u--; queries[i].v--;
+    }
+    DSU d(n);
+    vector<string> results;
+    for (int i = k - 1; i >= 0; i--) {
+        if (queries[i].type == "ask") {
+            if (d.same(queries[i].u, queries[i].v)) {
+                results.push_back("YES");
+            } else {
+                results.push_back("NO");
+            }
+        } else {
+            d.unite(queries[i].u, queries[i].v);
+        }
+    }
+    reverse(results.begin(), results.end());
+    for (const string& res : results) {
+        cout << res << '\n';
+    }
 }
 
 int main() {
